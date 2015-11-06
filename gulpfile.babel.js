@@ -33,7 +33,7 @@ gulp.task('script', () => {
     }));
 });
 
-gulp.task('styles', () => {
+gulp.task('styles', ['fonts'], () => {
   gulp.src('src/styles/**/*.{scss,sass}')
     .pipe(sass({
       includePaths: ['node_modules']
@@ -44,10 +44,17 @@ gulp.task('styles', () => {
     }));
 });
 
+
+// Fonts
+gulp.task('fonts', () => {
+  gulp.src('node_modules/bootstrap/fonts/*')
+    .pipe(gulp.dest('dist/fonts/bootstrap'));
+});
+
 gulp.task('build', ['html', 'script', 'styles']);
 
 gulp.task("deploy", ["build"], () => {
-  ghPages.publish("dist"));
+  ghPages.publish("dist");
 });
 
 gulp.task('serve', ['build'], () => {
