@@ -14,7 +14,7 @@ function initMap() {
   var map = new google.maps.Map(document.getElementById('map'), {
     mapTypeControl: true,
     center: {lat: 18.5790242, lng: -72.844734},
-    zoom: 8
+    zoom: 9,
   });
 
 
@@ -195,3 +195,16 @@ function init_map1() {
 
 window.initMap = initMap;
 window.init_map1 = init_map1;
+
+$(function () {
+    if (window.location == window.parent.location) {
+        $('#fullscreen').html('<span class="fa fa-compress"></span>');
+        $('#fullscreen').attr('href', 'http://bootsnipp.com/mouse0270/snippets/rVnOR');
+        $('#fullscreen').attr('title', 'Back To Bootsnipp');
+    }
+    $('#fullscreen').on('click', function(event) {
+        event.preventDefault();
+        window.parent.location =  $('#fullscreen').attr('href');
+    });
+    $('#fullscreen').tooltip();
+});
