@@ -6,19 +6,20 @@ require('bootstrap');
 // $(() => {
 // });
 
+
 function initMap() {
-  var origin_place_id = null;
-  var destination_place_id = null;
+  var origin_place_id = 0;
+  var destination_place_id = 0;
   var travel_mode = google.maps.TravelMode.WALKING;
   var map = new google.maps.Map(document.getElementById('map'), {
-    mapTypeControl: false,
-    center: {lat: -33.8688, lng: 151.2195},
-    zoom: 13
+    mapTypeControl: true,
+    center: {lat: 18.5790242, lng: -72.844734},
+    zoom: 8
   });
 
 
   /*Markers*/
-  var potty = 'images/toilet.png';
+/*  var potty = 'images/toilet.png';
   var marker = new google.maps.Marker({
       position: {lat: -33.8688, lng: 151.2195 },
       map: map,
@@ -26,21 +27,40 @@ function initMap() {
       title: 'Hello World!',
 });
 
-     var water = 'images/freshWater.png';
-     var marker = new google.maps.Marker({
-     position: {lat: -28.3993533, lng: 145.0124699 },
-     map: map,
-     icon: water,
-     title: 'Water!'
-   });
-
    var bottle = 'images/water-bottle.png';
    var marker = new google.maps.Marker({
    position: {lat: -32.1181532, lng: 142.7273136},
    map: map,
    icon: bottle,
    title: 'Bottle!'
- });
+ }); */
+
+
+/* Multiple Markers */
+
+var labels = '';
+var labelIndex = 0;
+
+function initialize() {
+  google.maps.event.addListener(map, 'click', function(event) {
+    addMarker(event.latLng, map);
+  });
+
+  // addMarker({}, map);
+}
+
+function addMarker(location, map) {
+  var water = 'images/freshWater.png';
+  var marker = new google.maps.Marker({
+    position: location,
+    label: labels[labelIndex++ % labels.length],
+    map: map,
+    icon: water,
+    title: 'Water!'
+  });
+}
+
+google.maps.event.addDomListener(window, 'load', initialize,);
 
 
 
@@ -48,6 +68,8 @@ function initMap() {
   var directionsService = new google.maps.DirectionsService;
   var directionsDisplay = new google.maps.DirectionsRenderer;
   directionsDisplay.setMap(map);
+  directionsDisplay.setPanel(document.getElementById('right-panel'));
+
 
   var origin_input = document.getElementById('origin-input');
   var destination_input = document.getElementById('destination-input');
@@ -62,18 +84,6 @@ function initMap() {
   var destination_autocomplete =
       new google.maps.places.Autocomplete(destination_input);
   destination_autocomplete.bindTo('bounds', map);
-
-  // Sets a listener on a radio button to change the filter type on Places
-  // Autocomplete.
-  function setupClickListener(id, mode) {
-    var radioButton = document.getElementById(id);
-    radioButton.addEventListener('click', function() {
-      travel_mode = mode;
-    });
-  }
-  setupClickListener('changemode-walking', google.maps.TravelMode.WALKING);
-  setupClickListener('changemode-transit', google.maps.TravelMode.TRANSIT);
-  setupClickListener('changemode-driving', google.maps.TravelMode.DRIVING);
 
   function expandViewportToFitPlace(map, place) {
     if (place.geometry.viewport) {
@@ -92,8 +102,6 @@ function initMap() {
     }
     expandViewportToFitPlace(map, place);
 
-    // If the place has a geometry, store its place ID and route if we have
-    // the other place ID
     origin_place_id = place.place_id;
     route(origin_place_id, destination_place_id, travel_mode,
           directionsService, directionsDisplay);
@@ -107,8 +115,6 @@ function initMap() {
     }
     expandViewportToFitPlace(map, place);
 
-    // If the place has a geometry, store its place ID and route if we have
-    // the other place ID
     destination_place_id = place.place_id;
     route(origin_place_id, destination_place_id, travel_mode,
           directionsService, directionsDisplay);
@@ -131,26 +137,61 @@ function initMap() {
       }
     });
   }
+
+  var onChangeHandler = function() {
+     calculateAndDisplayRoute(directionsService, directionsDisplay);
+  };
+  document.getElementById('origin-input').addEventListener('change', onChangeHandler);
+  document.getElementById('destination-input').addEventListener('change', onChangeHandler);
+
+  function setupClickListener(id, mode) {
+    var radioButton = document.getElementById(id);
+    radioButton.addEventListener('click', function() {
+      travel_mode = mode;
+    });
+  }
+  setupClickListener('changemode-walking', google.maps.TravelMode.WALKING);
+  setupClickListener('changemode-transit', google.maps.TravelMode.TRANSIT);
+  setupClickListener('changemode-driving', google.maps.TravelMode.DRIVING);
 }
+
+function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+  var origin_input = document.getElementById('origin-input').value;
+  var destination_input = document.getElementById('destination-input').value;
+
+//  var start = document.getElementById('origin_place_id').value;
+//  var end = document.getElementById('destination_place_id').value;
+  directionsService.route({
+    origin: origin_input,
+    destination: destination_input,
+    travelMode: google.maps.TravelMode.DRIVING
+  }, function(response, status) {
+    if (status === google.maps.DirectionsStatus.OK) {
+      directionsDisplay.setDirections(response);
+    } else {
+      window.alert('Directions request failed due to ' + status);
+    }
+  })
+};
 
 // Map for Contacts Page
 
 function init_map1() {
-    let myLocation = new google.maps.LatLng(27.7701374,-82.6364116);
-    let mapOptions = {
+    var myLocation = new google.maps.LatLng(27.7701374,-82.6364116);
+    var mapOptions = {
         center: myLocation,
         zoom: 15
     };
-    let marker = new google.maps.Marker({
+    var map1 = new google.maps.Map(document.getElementById("map1"), mapOptions);
+    var koteglo = 'images/Koteglo4.png';
+    var marker = new google.maps.Marker({
         position: myLocation,
-        title: "Property Location"
+        icon: koteglo,
+        map: map1,
+        title: "Koteglo"
     });
-    let map = new google.maps.Map(document.getElementById("map1"),
-        mapOptions);
-    marker.setMap(map);
-};
-
-
+    marker.setMap(map1);
+}
 
 window.initMap = initMap;
 window.init_map1 = init_map1;
